@@ -5,7 +5,8 @@
 
 @theme inline {
   --font-inter: var(--font-inter);
-  --font-mono: var(--font-mono);
+  --font-machine: var(--font-machine);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -49,8 +50,6 @@
 }
 
 :root {
-  --font-inter: var(--font-inter);
-  --font-mono: var(--font-mono);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

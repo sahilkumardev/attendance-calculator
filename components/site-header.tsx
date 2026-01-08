@@ -6,7 +6,7 @@ export function SiteHeader() {
     <header className="flex items-center justify-between max-w-6xl mx-auto sm:h-16 fixed top-0 left-0 right-0 px-6 sm:px-0 h-12">
       <Link
         href="/"
-        className="[&_svg]:size-6 sm:[&_svg]:size-7.5 [&svg]:shrink-0 flex items-center justify-center gap-x-2 font-mono"
+        className="[&_svg]:size-6 sm:[&_svg]:size-7.5 [&svg]:shrink-0 flex items-center justify-center gap-x-2 font-machine"
       >
         <svg
           viewBox="0 0 5844 5869"
@@ -22,8 +22,8 @@ export function SiteHeader() {
           </g>
         </svg>
         <p className="flex flex-col justify-center gap-4 pt-1.5">
-          <span className="text-lg sm:text-xl leading-0">Create</span>
-          <span className="text-sm leading-0">Starter Pack</span>
+          <span className="text-lg sm:text-xl leading-0">Attendance</span>
+          <span className="text-sm leading-0">% Calculator</span>
         </p>
       </Link>
 

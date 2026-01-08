@@ -2,28 +2,23 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import localFont from "next/font/local";
 
-export const mono = localFont({
+const inter = localFont({
+  src: "../fonts/inter.woff2",
+  variable: "--font-inter",
+});
+
+const machine = localFont({
   src: [
     {
-      path: "../fonts/mono-light.woff2",
+      path: "../fonts/machine-light.woff2",
       weight: "300",
     },
     {
-      path: "../fonts/mono-regular.woff2",
+      path: "../fonts/machine-regular.woff2",
       weight: "400",
     },
   ],
-  variable: "--font-mono",
-});
-
-export const inter = localFont({
-  src: [
-    {
-      path: "../fonts/inter.woff2",
-    },
-  ],
-  variable: "--font-inter",
-  display: "swap",
+  variable: "--font-machine",
 });
 
 export function FontWrapper({
@@ -33,9 +28,9 @@ export function FontWrapper({
   return (
     <div
       className={cn(
-        "font-inter tracking-wide antialiased font-normal leading-normal ",
+        "font-inter tracking-wide antialiased font-normal leading-normal",
         inter.variable,
-        mono.variable,
+        machine.variable,
         className
       )}
     >
