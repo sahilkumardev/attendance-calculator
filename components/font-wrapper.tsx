@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import localFont from "next/font/local";
 
-const mono = localFont({
+export const mono = localFont({
   src: [
     {
       path: "../fonts/mono-light.woff2",
@@ -16,7 +16,7 @@ const mono = localFont({
   variable: "--font-mono",
 });
 
-const inter = localFont({
+export const inter = localFont({
   src: [
     {
       path: "../fonts/inter.woff2",

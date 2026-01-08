@@ -1,10 +1,35 @@
 import "@/styles/globals.css";
 
 import type { Metadata } from "next";
-import { FontWrapper } from "@/components/font-wrapper";
-import { MaxWidthWrapper } from "@/components/max-with-wrapper";
+// import { inter, mono } from "@/components/font-wrapper";
+// import { MaxWidthWrapper } from "@/components/max-with-wrapper";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+// import { Background } from "@/components/background";
+import { cn } from "@/lib/utils";
+
+import localFont from "next/font/local";
+
+const inter = localFont({
+  src: "./fonts/inter.woff2",
+  variable: "--font-inter",
+});
+
+const mono = localFont({
+  src: [
+    {
+      path: "./fonts/mono-light.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "./fonts/mono-regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "Attendance Percentage Calculator",
@@ -17,15 +42,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <FontWrapper>
-          <MaxWidthWrapper>
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-          </MaxWidthWrapper>
-        </FontWrapper>
+    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+      <body className={cn("dark", inter.variable, mono.variable)}>
+        {/* <FontWrapper> */}
+        {/* <MaxWidthWrapper> */}
+          {/* <Background /> */}
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        {/* </MaxWidthWrapper> */}
+        {/* </FontWrapper> */}
       </body>
     </html>
   );
