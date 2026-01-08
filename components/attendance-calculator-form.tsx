@@ -1,13 +1,15 @@
-import { useState } from "react";
+import * as React from "react";
 
-interface AttendanceFormProps {
+interface AttendanceCalculatorFormProps {
   onCalculate: (totalConducted: number, totalAttended: number) => void;
 }
 
-const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
-  const [totalConducted, setTotalConducted] = useState("");
-  const [totalAttended, setTotalAttended] = useState("");
-  const [error, setError] = useState("");
+export function AttendanceCalculatorForm({
+  onCalculate,
+}: AttendanceCalculatorFormProps) {
+  const [totalConducted, setTotalConducted] = React.useState("");
+  const [totalAttended, setTotalAttended] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,16 +50,16 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
     <div className="border border-(--color-border) rounded-lg p-6 sm:p-10 bg-(--color-card)">
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--color-primary)/10">
-            <span className="text-sm font-bold text-(--color-primary)">1</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+            <span className="text-sm font-bold text-primary">1</span>
           </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-(--color-foreground)">
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground">
             Enter your current attendance
           </h2>
         </div>
-        <p className="text-sm sm:text-base text-(--color-muted-foreground) leading-relaxed ml-0 sm:ml-10">
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed ml-0 sm:ml-10">
           Start by entering how many classes have been conducted and how many
-          you've attended so far
+          you&apos;ve attended so far
         </p>
       </div>
 
@@ -66,7 +68,7 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
           <div className="space-y-3">
             <label
               htmlFor="totalConducted"
-              className="text-base font-medium text-(--color-foreground) flex items-center gap-2"
+              className="text-base font-medium text-foreground flex items-center gap-2"
             >
               Total classes conducted
               <span className="text-xs text-(--color-muted-foreground) font-normal">
@@ -79,7 +81,7 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
               value={totalConducted}
               onChange={(e) => setTotalConducted(e.target.value)}
               min="0"
-              className="h-12 sm:h-14 w-full rounded border-2 border-(--color-border) bg-(--color-input) px-4 sm:px-5 text-base sm:text-lg text-(--color-foreground) placeholder:text-(--color-muted-foreground) focus:outline-none focus:border-(--color-primary) transition-colors"
+              className="h-12 sm:h-14 w-full rounded border-2 border-border bg-input px-4 sm:px-5 text-base sm:text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
             <p className="text-xs text-(--color-muted-foreground) mt-1">
               Total number of classes that happened
@@ -89,7 +91,7 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
           <div className="space-y-3">
             <label
               htmlFor="totalAttended"
-              className="text-base font-medium text-(--color-foreground) flex items-center gap-2"
+              className="text-base font-medium text-foreground flex items-center gap-2"
             >
               Classes you attended
               <span className="text-xs text-(--color-muted-foreground) font-normal">
@@ -102,7 +104,7 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
               value={totalAttended}
               onChange={(e) => setTotalAttended(e.target.value)}
               min="0"
-              className="h-12 sm:h-14 w-full rounded border-2 border-(--color-border) bg-(--color-input) px-4 sm:px-5 text-base sm:text-lg text-(--color-foreground) placeholder:text-(--color-muted-foreground) focus:outline-none focus:border-(--color-primary) transition-colors"
+              className="h-12 sm:h-14 w-full rounded border-2 border-border bg-input px-4 sm:px-5 text-base sm:text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
             <p className="text-xs text-(--color-muted-foreground) mt-1">
               How many classes you were present for
@@ -111,7 +113,7 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
         </div>
 
         {error && (
-          <div className="mt-6 p-4 rounded-lg bg-(--color-destructive)/10 border border-(--color-destructive)/30">
+          <div className="mt-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
             <div className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -121,13 +123,13 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-5 w-5 text-(--color-destructive) shrink-0"
+                className="h-5 w-5 text-destructive shrink-0"
               >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
-              <p className="text-sm font-medium text-(--color-destructive)">
+              <p className="text-sm font-medium text-destructive">
                 {error}
               </p>
             </div>
@@ -136,13 +138,11 @@ const AttendanceForm = ({ onCalculate }: AttendanceFormProps) => {
 
         <button
           type="submit"
-          className="cursor-pointer mt-6 sm:mt-8 w-full h-12 sm:h-14 rounded bg-(--color-primary) text-base sm:text-lg font-semibold text-(--color-primary-foreground) hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-(--color-ring) focus:ring-offset-2 transition-all"
+          className="cursor-pointer mt-6 sm:mt-8 w-full h-12 sm:h-14 rounded bg-primary text-base sm:text-lg font-semibold text-primary-foreground hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-all"
         >
           Calculate My Attendance →
         </button>
       </form>
     </div>
   );
-};
-
-export default AttendanceForm;
+}
