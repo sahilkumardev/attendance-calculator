@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Background } from "@/components/background";
 import { FontWrapper } from "@/components/font-wrapper";
+import { QueryProvider } from "@/components/query-provider";
 
 export const metadata: Metadata = {
   title: "Attendance Percentage Calculator",
@@ -20,14 +21,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="dark">
-        <FontWrapper>
-          <MaxWidthWrapper>
-            <Background />
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-          </MaxWidthWrapper>
-        </FontWrapper>
+        <QueryProvider>
+          <FontWrapper>
+            <MaxWidthWrapper>
+              <Background />
+              <SiteHeader />
+              {children}
+              <SiteFooter />
+            </MaxWidthWrapper>
+          </FontWrapper>
+        </QueryProvider>
       </body>
     </html>
   );
