@@ -2,10 +2,11 @@ import * as React from "react";
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { TotalVisitors } from "@/components/total-visitors";
 
 export function SiteFooter() {
   return (
-    <footer className="place-content-center place-items-center absolute bottom-0 w-full">
+    <footer className="place-content-center place-items-center w-full">
       <div
         className={cn(
           "h-px w-full bg-size-[var(--height)_var(--width)] dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
@@ -24,18 +25,23 @@ export function SiteFooter() {
         }
       />
       <div className="place-items-center py-4 sm:flex sm:items-center sm:justify-between sm:py-6 px-8 text-sm text-muted-foreground w-full">
-        <h1>{new Date().getFullYear()} © All rights reserved.</h1>
-        <p className="">
-          Design & develop by ❤️
-          <Link
-            href="https://sahilkumardev.com"
-            target="_blank"
-            referrerPolicy="no-referrer"
-            className="ml-1.5 hover:text-foreground font-mono tracking-wider text-green-400"
-          >
-            sahilkumardev
-          </Link>
-        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-0 w-full sm:justify-between">
+          <h1>{new Date().getFullYear()} © All rights reserved.</h1>
+          
+          <TotalVisitors />
+          
+          <p className="">
+            Design & develop by ❤️
+            <Link
+              href="https://sahilkumardev.com"
+              target="_blank"
+              referrerPolicy="no-referrer"
+              className="ml-1.5 hover:text-foreground font-mono tracking-wider text-green-400"
+            >
+              sahilkumardev
+            </Link>
+          </p>
+        </div>
       </div>
     </footer>
   );
