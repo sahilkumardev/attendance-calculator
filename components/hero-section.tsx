@@ -14,12 +14,18 @@ export function HeroSection() {
   };
 
   return (
-    <section className="min-h-screen flex justify-center items-center">
-     <div>
-       <h1 className="text-3xl mb-6 font-machine">
-        Attendance Percentage Calculator
-      </h1>
-      <div className="space-y-8">
+    <section className="min-h-[calc(100vh-4.5rem)] flex justify-center items-center flex-col">
+      <div className="text-center mb-8 max-w-xl">
+        <h1 className="text-3xl font-machine mb-2">
+          Attendance Percentage Calculator
+        </h1>
+        <p className="text-muted-foreground">
+          Start by entering how many classes have been conducted and how many
+          you&apos;ve attended so far
+        </p>
+      </div>
+
+      <div>
         <AttendanceCalculatorForm onCalculate={handleCalculate} />
 
         {totalConducted !== null && totalAttended !== null && (
@@ -30,7 +36,8 @@ export function HeroSection() {
           />
         )}
       </div>
-
+      <div>
+        {/* 
         <div>
           {totalConducted !== null && totalAttended !== null ? (
             <AttendanceCalculator
@@ -67,9 +74,8 @@ export function HeroSection() {
               </div>
             </div>
           )}
-        </div>
-      
-     </div>
+        </div> */}
+      </div>
     </section>
   );
 }
