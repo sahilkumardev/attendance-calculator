@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Background } from "@/components/background";
 import { FontWrapper } from "@/components/font-wrapper";
 import { QueryProvider } from "@/components/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Attendance Percentage Calculator",
@@ -28,6 +29,7 @@ export default function RootLayout({
               <SiteHeader />
               {children}
               <SiteFooter />
+              <Toaster position="top-center" />
             </MaxWidthWrapper>
           </FontWrapper>
         </QueryProvider>

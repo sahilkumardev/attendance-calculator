@@ -1,6 +1,14 @@
 import * as React from "react";
-import { CardBox } from "./ui/box";
-import { Button } from "./ui/button";
+import { CardBox } from "@/components/ui/box";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  FieldSet,
+} from "@/components/ui/field";
 
 interface AttendanceCalculatorFormProps {
   onCalculate: (totalConducted: number, totalAttended: number) => void;
@@ -9,40 +17,37 @@ interface AttendanceCalculatorFormProps {
 export function AttendanceCalculatorForm({
   onCalculate,
 }: AttendanceCalculatorFormProps) {
-  const [totalConducted, setTotalConducted] = React.useState("");
-  const [totalAttended, setTotalAttended] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [totalConducted, setTotalConducted] = React.useState<number>(0);
+  const [totalAttended, setTotalAttended] = React.useState<number>(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
-    const conducted = parseInt(totalConducted);
-    const attended = parseInt(totalAttended);
+    const conducted = totalConducted;
+    const attended = totalAttended;
 
     if (!totalConducted || !totalAttended) {
-      setError("Please fill in both fields");
-      return;
+      return toast.error(
+        "Please provide both total classes conducted and classes attended."
+      );
     }
 
     if (isNaN(conducted) || isNaN(attended)) {
-      setError("Please enter valid numbers");
-      return;
+      return toast.error("Please enter valid numeric values.");
     }
 
     if (conducted <= 0) {
-      setError("Total classes must be greater than 0");
-      return;
+      return toast.error("Total classes conducted must be greater than zero.");
     }
 
     if (attended < 0) {
-      setError("Classes attended cannot be negative");
-      return;
+      return toast.error("Classes attended cannot be a negative value.");
     }
 
     if (attended > conducted) {
-      setError("You can't attend more classes than were conducted!");
-      return;
+      return toast.error(
+        "Classes attended cannot exceed total classes conducted."
+      );
     }
 
     onCalculate(conducted, attended);
@@ -51,75 +56,51 @@ export function AttendanceCalculatorForm({
   return (
     <CardBox>
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="space-y-3">
-            <label
-              htmlFor="totalConducted"
-              className="text-base font-medium text-foreground flex items-center gap-2"
-            >
+        <FieldSet className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Field>
+            <FieldLabel htmlFor="total-conducted">
               Total classes conducted
-              <span className="text-xs text-muted-foreground font-normal">
-                (till today)
+              <span className="text-xs text-muted-foreground -mb-1">
+                till today
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
+              id="total-conducted"
               type="number"
-              id="totalConducted"
+              placeholder="0"
+              min="0"
               value={totalConducted}
-              onChange={(e) => setTotalConducted(e.target.value)}
-              min="0"
-              className="h-12 sm:h-14 w-full rounded border-2 border-border bg-input px-4 sm:px-5 text-base sm:text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              onChange={(e) => setTotalConducted(Number(e.target.value))}
+              className="hide-input-number"
+              required
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <FieldDescription>
               Total number of classes that happened
-            </p>
-          </div>
+            </FieldDescription>
+          </Field>
 
-          <div className="space-y-3">
-            <label
-              htmlFor="totalAttended"
-              className="text-base font-medium text-foreground flex items-center gap-2"
-            >
+          <Field>
+            <FieldLabel htmlFor="attend-classes">
               Classes you attended
-              <span className="text-xs text-(--color-muted-foreground) font-normal">
-                (so far)
+              <span className="text-xs text-muted-foreground -mb-1">
+                so far
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
+              id="attend-classes"
               type="number"
-              id="totalAttended"
-              value={totalAttended}
-              onChange={(e) => setTotalAttended(e.target.value)}
+              placeholder="0"
               min="0"
-              className="h-12 sm:h-14 w-full rounded border-2 border-border bg-input px-4 sm:px-5 text-base sm:text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              value={totalAttended}
+              onChange={(e) => setTotalAttended(Number(e.target.value))}
+              className="hide-input-number"
+              required
             />
-            <p className="text-xs text-(--color-muted-foreground) mt-1">
+            <FieldDescription>
               How many classes you were present for
-            </p>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mt-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
-            <div className="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5 text-destructive shrink-0"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <p className="text-sm font-medium text-destructive">{error}</p>
-            </div>
-          </div>
-        )}
+            </FieldDescription>
+          </Field>
+        </FieldSet>
 
         <Button type="submit" size="lg" className="mt-8 w-full">
           Calculate My Attendance →

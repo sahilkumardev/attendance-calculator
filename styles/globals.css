@@ -127,3 +127,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .hide-input-number {
+    @apply [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+  }
+}
