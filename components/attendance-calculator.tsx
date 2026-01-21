@@ -20,6 +20,7 @@ import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
 export function AttendanceCalculator() {
   const [conductedClasses, setConductedClasses] = React.useState<number>(0);
   const [attendedClasses, setAttendedClasses] = React.useState<number>(0);
+  const [minAttendance, setMinAttendance] = React.useState<number>(75);
   const [totalClasses, setTotalClasses] = React.useState<number>(0);
   const [isPending, startTransition] = React.useTransition();
   const [showAttendanceInfo, setShowAttendanceInfo] =
@@ -46,6 +47,11 @@ export function AttendanceCalculator() {
         return;
       }
 
+      if (minAttendance < 0 || minAttendance > 100) {
+        toast.error("Minimum attendance must be between 0 and 100.");
+        return;
+      }
+
       if (attendedClasses > conductedClasses) {
         toast.error("Classes attended cannot exceed total classes conducted.");
         return;
@@ -61,7 +67,7 @@ export function AttendanceCalculator() {
 
   return (
     <>
-      <CardBox>
+      <CardBox className="relative">
         <form onSubmit={handleSubmit}>
           <FieldSet className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Field>
@@ -105,6 +111,33 @@ export function AttendanceCalculator() {
                 How many classes you were present for
               </FieldDescription>
             </Field>
+
+            <div className="absolute -top-5.5 flex items-center justify-center left-0 right-0 w-full">
+              <h1 className="border p-2 size-10 rounded-full bg-muted">75</h1>
+
+              <div>
+                <Field>
+                  <FieldLabel htmlFor="min-attendance">
+                    Minimum Attendance
+                    <span className="text-xs text-muted-foreground -mb-1">
+                      Required %
+                    </span>
+                  </FieldLabel>
+                  <Input
+                    id="min-attendance"
+                    type="number"
+                    placeholder="75"
+                    value={minAttendance || ""}
+                    onChange={(e) => setMinAttendance(Number(e.target.value))}
+                    className="hide-input-number"
+                    required
+                  />
+                  <FieldDescription>
+                    The cutoff percentage (default: 75%)
+                  </FieldDescription>
+                </Field>
+              </div>
+            </div>
           </FieldSet>
 
           <Button
@@ -130,7 +163,7 @@ export function AttendanceCalculator() {
               </p>
             </div>
             <p className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
-              <span className={getAttendanceColor(totalClasses)}>
+              <span className={getAttendanceColor(totalClasses, minAttendance)}>
                 {totalClasses}
               </span>
 
@@ -138,9 +171,9 @@ export function AttendanceCalculator() {
             </p>
           </div>
 
-          {totalClasses <= 75 && (
+          {totalClasses <= minAttendance && (
             <Link
-              href={`/planner?conducted=${conductedClasses}&attended=${attendedClasses}`}
+              href={`/planner?conducted=${conductedClasses}&attended=${attendedClasses}&min=${minAttendance}`}
               className="mt-5 hover:underline hover:text-muted-foreground underline-offset-5 duration-300"
             >
               Plan Your Attendance
@@ -149,9 +182,9 @@ export function AttendanceCalculator() {
 
           <p className="text-sm text-muted-foreground mt-2">
             💡 <strong>Pro tip:</strong>{" "}
-            {totalClasses >= 75
+            {totalClasses >= minAttendance
               ? "You're doing great! Keep maintaining this attendance."
-              : "Try to attend more classes to reach 75% for a safer margin."}
+              : `Try to attend more classes to reach ${minAttendance}% for a safer margin.`}
           </p>
         </CardBox>
       )}

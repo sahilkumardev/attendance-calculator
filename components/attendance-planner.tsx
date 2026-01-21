@@ -18,11 +18,13 @@ import { ArrowDown, ArrowUp, Percent } from "lucide-react";
 interface AttendancePlannerProps {
   conductedClasses: number;
   attendedClasses: number;
+  minAttendance?: number;
 }
 
 export function AttendancePlanner({
   conductedClasses,
   attendedClasses,
+  minAttendance = 75,
 }: AttendancePlannerProps) {
   const [upcomingClasses, setUpcomingClasses] = React.useState<number>(0);
   const [attendedUpcomingClasses, setAttendedUpcomingClasses] =
@@ -154,7 +156,12 @@ export function AttendancePlanner({
 
             <div className="flex items-center gap-3 justify-center mt-2">
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
-                <span className={getAttendanceColor(result.percentage)}>
+                <span
+                  className={getAttendanceColor(
+                    result.percentage,
+                    minAttendance,
+                  )}
+                >
                   {result.percentage}
                 </span>
 
@@ -164,7 +171,7 @@ export function AttendancePlanner({
                 <div
                   className={cn(
                     "text-lg sm:text-base font-bold flex items-center gap-1",
-                    getAttendanceColor(result.percentage),
+                    getAttendanceColor(result.percentage, minAttendance),
                   )}
                 >
                   {result.percentage >= currentPercentage ? (
@@ -179,7 +186,7 @@ export function AttendancePlanner({
                 <span
                   className={cn(
                     "text-xs font-bold uppercase tracking-wider",
-                    getAttendanceColor(result.percentage),
+                    getAttendanceColor(result.percentage, minAttendance),
                   )}
                 >
                   {result.percentage >= currentPercentage
@@ -192,7 +199,12 @@ export function AttendancePlanner({
               </div>
 
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
-                <span className={getAttendanceColor(currentPercentage)}>
+                <span
+                  className={getAttendanceColor(
+                    currentPercentage,
+                    minAttendance,
+                  )}
+                >
                   {currentPercentage}
                 </span>
 

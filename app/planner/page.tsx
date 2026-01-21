@@ -7,6 +7,7 @@ export default function Page() {
   const searchParams = useSearchParams();
   const conductedClasses = Number(searchParams.get("conducted"));
   const attendedClasses = Number(searchParams.get("attended"));
+  const minAttendance = Number(searchParams.get("min")) || 75;
 
   if (!conductedClasses || !attendedClasses) {
     redirect("/");
@@ -26,6 +27,7 @@ export default function Page() {
       <AttendancePlanner
         conductedClasses={conductedClasses}
         attendedClasses={attendedClasses}
+        minAttendance={minAttendance}
       />
     </>
   );
