@@ -1,7 +1,17 @@
-import React from "react";
+"use client";
+
 import { AttendancePlanner } from "@/components/attendance-planner";
+import { redirect, useSearchParams } from "next/navigation";
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const conductedClasses = Number(searchParams.get("conducted"));
+  const attendedClasses = Number(searchParams.get("attended"));
+
+  if (!conductedClasses || !attendedClasses) {
+    redirect("/");
+  }
+
   return (
     <>
       <div className="text-center mb-8 max-w-xl">
@@ -13,7 +23,10 @@ export default function Page() {
         </p>
       </div>
 
-      <AttendancePlanner />
+      <AttendancePlanner
+        conductedClasses={conductedClasses}
+        attendedClasses={attendedClasses}
+      />
     </>
   );
 }

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Percent } from "lucide-react";
 import Link from "next/link";
 import { getAttendanceColor } from "@/lib/get-attendance-color";
+import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
 
 export function AttendanceCalculator() {
   const [conductedClasses, setConductedClasses] = React.useState<number>(0);
@@ -23,7 +24,6 @@ export function AttendanceCalculator() {
   const [isPending, startTransition] = React.useTransition();
   const [showAttendanceInfo, setShowAttendanceInfo] =
     React.useState<boolean>(false);
-  // const [minimumPercentage, setMinimumPercentage] = React.useState<number>(75);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,7 +51,10 @@ export function AttendanceCalculator() {
         return;
       }
 
-      setTotalClasses(Math.round((attendedClasses / conductedClasses) * 100));
+      setTotalClasses(
+        getAttendancePercentage(conductedClasses, attendedClasses),
+      );
+
       setShowAttendanceInfo(true);
     });
   }
@@ -137,7 +140,7 @@ export function AttendanceCalculator() {
 
           {totalClasses <= 75 && (
             <Link
-              href={"/planner"}
+              href={`/planner?conducted=${conductedClasses}&attended=${attendedClasses}`}
               className="mt-5 hover:underline hover:text-muted-foreground underline-offset-5 duration-300"
             >
               Plan Your Attendance

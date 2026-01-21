@@ -8,48 +8,60 @@ import {
   FieldLabel,
   FieldDescription,
 } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
 import { CardBox } from "@/components/ui/box";
 import { Input } from "@/components/ui/input";
 import { getAttendanceColor } from "@/lib/get-attendance-color";
-import { cn } from "@/lib/utils";
+import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
+import { ArrowDown, ArrowUp, Percent } from "lucide-react";
 
-export function AttendancePlanner() {
+interface AttendancePlannerProps {
+  conductedClasses: number;
+  attendedClasses: number;
+}
+
+export function AttendancePlanner({
+  conductedClasses,
+  attendedClasses,
+}: AttendancePlannerProps) {
   const [upcomingClasses, setUpcomingClasses] = React.useState<number>(0);
   const [attendedUpcomingClasses, setAttendedUpcomingClasses] =
     React.useState<number>(0);
 
-  // const [isPending, startTransition] = React.useTransition();
+  const currentPercentage = getAttendancePercentage(
+    conductedClasses,
+    attendedClasses,
+  );
 
-  const totalConducted = 100;
-  const totalAttended = 75;
-
-  const currentPercentage = Math.round((totalAttended / totalConducted) * 100);
-
-  const futureResult = React.useMemo(() => {
-    if (!upcomingClasses || !attendedUpcomingClasses) {
-      return { percentage: null, error: "" };
-    }
-
+  const result = React.useMemo(() => {
     if (upcomingClasses < 0 || attendedUpcomingClasses < 0) {
-      return { percentage: null, error: "Values cannot be negative" };
+      return {
+        percentage: null,
+        validation: "Class numbers cannot be negative",
+      };
     }
 
     if (attendedUpcomingClasses > upcomingClasses) {
       return {
         percentage: null,
-        error: "You cannot attend more classes than are scheduled",
+        validation: "You cannot attend more classes than are scheduled",
       };
     }
 
-    const newTotal = totalConducted + upcomingClasses;
-    const newAttended = totalAttended + attendedUpcomingClasses;
-    const percentage = Math.round((newAttended / newTotal) * 100);
+    const renewClasses = conductedClasses + upcomingClasses;
+    const renewAttendedClasses = attendedClasses + attendedUpcomingClasses;
+    const renewPercentage = getAttendancePercentage(
+      renewClasses,
+      renewAttendedClasses,
+    );
 
-    return { percentage, error: "" };
-  }, [upcomingClasses, attendedUpcomingClasses]);
-
-  const futurePercentage = futureResult?.percentage ?? null;
-  const futureError = futureResult?.error ?? "";
+    return { percentage: renewPercentage, validation: null };
+  }, [
+    attendedUpcomingClasses,
+    conductedClasses,
+    upcomingClasses,
+    attendedClasses,
+  ]);
 
   return (
     <CardBox>
@@ -93,9 +105,27 @@ export function AttendancePlanner() {
         </Field>
       </FieldSet>
 
-      {futureError && (
-        <div className="mt-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
-          <div className="flex items-center gap-2">
+      <section>
+        <div
+          className={cn(
+            "h-px w-full bg-size-[var(--height)_var(--width)] dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
+            "[mask:linear-gradient(to_left,var(--background)_var(--fade-stop),transparent),linear-gradient(to_right,var(--background)_var(--fade-stop),transparent),linear-gradient(black,black)] mt-4 mb-6",
+          )}
+          style={
+            {
+              "--height": "5px",
+              "--width": "1px",
+              "--background": "#ffffff",
+              "--fade-stop": "90%",
+              "--color-dark": "rgba(255, 255, 255, 0.2)",
+              WebkitMaskComposite: "exclude",
+              maskComposite: "exclude",
+            } as React.CSSProperties
+          }
+        />
+
+        {result.validation && (
+          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -111,44 +141,67 @@ export function AttendancePlanner() {
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             <p className="text-sm font-medium text-destructive">
-              {futureError}
+              {result.validation}
             </p>
           </div>
-        </div>
-      )}
+        )}
 
-      {futurePercentage !== null && (
-        <div className="pt-8 border-t border-(--color-border)">
-          <p className="text-base text-(--color-muted-foreground) mb-3 uppercase tracking-wide">
-            Your projected attendance will be
-          </p>
-          <div className="flex items-baseline gap-4">
-            <p
-              className={cn("text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight", getAttendanceColor(
-                futurePercentage,
-              ))}
-            >
-              {futurePercentage}%
+        {result.percentage && (
+          <div>
+            <p className="text-muted-foreground font-machine text-center">
+              Your future attendance will be
             </p>
-            <div className="flex flex-col gap-1">
-              <span
-                className={cn("text-sm font-semibold", getAttendanceColor(
-                  futurePercentage,
-                ))}
-              >
-                {futurePercentage >= currentPercentage ? "↑" : "↓"}{" "}
-                {Math.abs(futurePercentage - currentPercentage)}%
-                {futurePercentage >= currentPercentage
-                  ? "increase"
-                  : "decrease"}
-              </span>
-              <span className="text-xs text-(--color-muted-foreground)">
-                compared to current
-              </span>
+
+            <div className="flex items-center gap-3 justify-center mt-2">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
+                <span className={getAttendanceColor(result.percentage)}>
+                  {result.percentage}
+                </span>
+
+                <Percent size={40} className="text-muted-foreground ml-0.5" />
+              </h1>
+              <div className="flex flex-col items-center justify-center px-2 sm:px-4">
+                <div
+                  className={cn(
+                    "text-lg sm:text-base font-bold flex items-center gap-1",
+                    getAttendanceColor(result.percentage),
+                  )}
+                >
+                  {result.percentage >= currentPercentage ? (
+                    <ArrowUp size={18} />
+                  ) : (
+                    <ArrowDown size={18} />
+                  )}
+                  <span>
+                    {Math.abs(result.percentage - currentPercentage)}%
+                  </span>
+                </div>
+                <span
+                  className={cn(
+                    "text-xs font-bold uppercase tracking-wider",
+                    getAttendanceColor(result.percentage),
+                  )}
+                >
+                  {result.percentage >= currentPercentage
+                    ? "Increase"
+                    : "Decrease"}
+                </span>
+                <span className="text-muted-foreground font-machine tracking-wide mt-0.5">
+                  from current
+                </span>
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
+                <span className={getAttendanceColor(currentPercentage)}>
+                  {currentPercentage}
+                </span>
+
+                <Percent size={40} className="text-muted-foreground ml-0.5" />
+              </h1>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </section>
     </CardBox>
   );
 }
