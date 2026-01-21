@@ -2,7 +2,7 @@ import { AttendanceCalculator } from "@/components/attendance-calculator";
 
 export default function Home() {
   return (
-    <section className="min-h-screen max-h-screen flex justify-center items-center flex-col">
+    <>
       <div className="text-center mb-8 max-w-xl">
         <h1 className="text-3xl font-machine mb-2">
           Attendance Percentage Calculator
@@ -14,6 +14,6 @@ export default function Home() {
       </div>
 
       <AttendanceCalculator />
-    </section>
+    </>
   );
 }

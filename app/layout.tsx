@@ -27,7 +27,9 @@ export default function RootLayout({
             <MaxWidthWrapper>
               <Background />
               <SiteHeader />
-              {children}
+              <div className="min-h-screen max-h-screen place-items-center place-content-center">
+                {children}
+              </div>
               <SiteFooter />
               <Toaster position="top-center" />
             </MaxWidthWrapper>

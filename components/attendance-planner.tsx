@@ -2,76 +2,98 @@
 
 import * as React from "react";
 
+import {
+  Field,
+  FieldSet,
+  FieldLabel,
+  FieldDescription,
+} from "@/components/ui/field";
+import { CardBox } from "@/components/ui/box";
+import { Input } from "@/components/ui/input";
+import { getAttendanceColor } from "@/lib/get-attendance-color";
+import { cn } from "@/lib/utils";
+
 export function AttendancePlanner() {
-  const [futureClasses, setFutureClasses] = React.useState("");
-  const [futureAttended, setFutureAttended] = React.useState("");
+  const [upcomingClasses, setUpcomingClasses] = React.useState<number>(0);
+  const [attendedUpcomingClasses, setAttendedUpcomingClasses] =
+    React.useState<number>(0);
+
+  // const [isPending, startTransition] = React.useTransition();
+
   const totalConducted = 100;
   const totalAttended = 75;
 
   const currentPercentage = Math.round((totalAttended / totalConducted) * 100);
 
-  // const futurePercentage = futureResult?.percentage ?? null;
-  // const futureError = futureResult?.error ?? "";
+  const futureResult = React.useMemo(() => {
+    if (!upcomingClasses || !attendedUpcomingClasses) {
+      return { percentage: null, error: "" };
+    }
+
+    if (upcomingClasses < 0 || attendedUpcomingClasses < 0) {
+      return { percentage: null, error: "Values cannot be negative" };
+    }
+
+    if (attendedUpcomingClasses > upcomingClasses) {
+      return {
+        percentage: null,
+        error: "You cannot attend more classes than are scheduled",
+      };
+    }
+
+    const newTotal = totalConducted + upcomingClasses;
+    const newAttended = totalAttended + attendedUpcomingClasses;
+    const percentage = Math.round((newAttended / newTotal) * 100);
+
+    return { percentage, error: "" };
+  }, [upcomingClasses, attendedUpcomingClasses]);
+
+  const futurePercentage = futureResult?.percentage ?? null;
+  const futureError = futureResult?.error ?? "";
 
   return (
-    <div className="border border-(--color-border) rounded-lg p-6 sm:p-10 bg-(--color-card)">
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-            <span className="text-sm font-bold text-primary">2</span>
-          </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-(--color-foreground)">
-            Plan your future attendance
-          </h2>
-        </div>
-        <p className="text-sm sm:text-base text-(--color-muted-foreground) leading-relaxed ml-0 sm:ml-10">
-          Enter how many classes are coming up and how many you plan to attend
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="space-y-3">
-          <label
-            htmlFor="futureClasses"
-            className="text-base font-medium text-(--color-foreground)"
-          >
+    <CardBox>
+      <FieldSet className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Field>
+          <FieldLabel htmlFor="upcoming-classes">
             Upcoming classes
-          </label>
-          <input
+            <span className="text-xs text-muted-foreground -mb-1">
+              till today
+            </span>
+          </FieldLabel>
+          <Input
+            id="upcoming-classes"
             type="number"
-            id="futureClasses"
-            value={futureClasses}
-            onChange={(e) => setFutureClasses(e.target.value)}
-            min="0"
-            className="h-12 sm:h-14 w-full rounded border-2 border-(--color-border) bg-(--color-input) px-4 sm:px-5 text-base sm:text-lg text-(--color-foreground) placeholder:text-(--color-muted-foreground) focus:outline-none focus:border-(--color-primary) transition-colors"
+            placeholder="0"
+            value={upcomingClasses || ""}
+            onChange={(e) => setUpcomingClasses(Number(e.target.value))}
+            className="hide-input-number"
+            required
           />
-          <p className="text-xs text-(--color-muted-foreground) mt-1">
+          <FieldDescription>
             How many more classes will happen?
-          </p>
-        </div>
+          </FieldDescription>
+        </Field>
 
-        <div className="space-y-3">
-          <label
-            htmlFor="futureAttended"
-            className="text-base font-medium text-(--color-foreground)"
-          >
-            You&apos;ll attend
-          </label>
-          <input
+        <Field>
+          <FieldLabel htmlFor="attended-upcoming-classes">
+            Classes you attended
+            <span className="text-xs text-muted-foreground -mb-1">so far</span>
+          </FieldLabel>
+          <Input
+            id="attended-upcoming-classes"
             type="number"
-            id="futureAttended"
-            value={futureAttended}
-            onChange={(e) => setFutureAttended(e.target.value)}
-            min="0"
-            className="h-12 sm:h-14 w-full rounded border-2 border-(--color-border) bg-(--color-input) px-4 sm:px-5 text-base sm:text-lg text-(--color-foreground) placeholder:text-(--color-muted-foreground) focus:outline-none focus:border-(--color-primary) transition-colors"
+            placeholder="0"
+            value={attendedUpcomingClasses || ""}
+            onChange={(e) => setAttendedUpcomingClasses(Number(e.target.value))}
+            className="hide-input-number"
+            required
           />
-          <p className="text-xs text-(--color-muted-foreground) mt-1">
-            How many will you be present for?
-          </p>
-        </div>
-      </div>
+          <FieldDescription>How many will you be present for?</FieldDescription>
+        </Field>
+      </FieldSet>
 
-      {/* {futureError && (
+      {futureError && (
         <div className="mt-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
           <div className="flex items-center gap-2">
             <svg
@@ -102,20 +124,20 @@ export function AttendancePlanner() {
           </p>
           <div className="flex items-baseline gap-4">
             <p
-              className={`text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight ${getAttendanceColor(
+              className={cn("text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight", getAttendanceColor(
                 futurePercentage,
-              )}`}
+              ))}
             >
               {futurePercentage}%
             </p>
             <div className="flex flex-col gap-1">
               <span
-                className={`text-sm font-semibold ${getAttendanceColor(
+                className={cn("text-sm font-semibold", getAttendanceColor(
                   futurePercentage,
-                )}`}
+                ))}
               >
                 {futurePercentage >= currentPercentage ? "↑" : "↓"}{" "}
-                {Math.abs(futurePercentage - currentPercentage)}%{" "}
+                {Math.abs(futurePercentage - currentPercentage)}%
                 {futurePercentage >= currentPercentage
                   ? "increase"
                   : "decrease"}
@@ -126,7 +148,7 @@ export function AttendancePlanner() {
             </div>
           </div>
         </div>
-      )} */}
-    </div>
+      )}
+    </CardBox>
   );
 }
