@@ -1,6 +1,6 @@
 export const calculateAttendance = (
   totalConducted: number,
-  totalAttended: number
+  totalAttended: number,
 ): number | null => {
   if (totalConducted === 0 || totalConducted < 0) {
     return null;
@@ -8,13 +8,6 @@ export const calculateAttendance = (
 
   const percentage = (totalAttended / totalConducted) * 100;
   return Math.round(percentage);
-};
-
-export const getAttendanceColor = (percentage: number | null): string => {
-  if (percentage === null) return "text-(--color-muted-foreground)";
-  if (percentage < 75) return "text-(--color-destructive)";
-  if (percentage < 85) return "text-(--color-warning)";
-  return "text-(--color-success)";
 };
 
 export const getAttendanceStatus = (percentage: number | null): string => {
@@ -25,7 +18,7 @@ export const getAttendanceStatus = (percentage: number | null): string => {
 };
 
 export const calculateAverageAttendance = (
-  courses: Array<{ totalConducted: number; totalAttended: number }>
+  courses: Array<{ totalConducted: number; totalAttended: number }>,
 ): number | null => {
   const validCourses = courses.filter((course) => course.totalConducted > 0);
 
@@ -33,13 +26,12 @@ export const calculateAverageAttendance = (
 
   const totalAttended = validCourses.reduce(
     (sum, course) => sum + course.totalAttended,
-    0
+    0,
   );
   const totalConducted = validCourses.reduce(
     (sum, course) => sum + course.totalConducted,
-    0
+    0,
   );
 
   return calculateAttendance(totalConducted, totalAttended);
 };
-//  calculateAttendance

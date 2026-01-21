@@ -26,15 +26,15 @@ export function HeroSection() {
       </div>
 
       <div>
-        <AttendanceCalculatorForm onCalculate={handleCalculate} />
+        <AttendanceCalculatorForm />
 
-        {totalConducted !== null && totalAttended !== null && (
+        {/* {totalConducted !== null && totalAttended !== null && (
           <AttendanceCalculator
             totalConducted={totalConducted}
             totalAttended={totalAttended}
             mode="planner"
           />
-        )}
+        )} */}
       </div>
       <div>
         {/* 

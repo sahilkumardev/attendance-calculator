@@ -5,8 +5,8 @@ function CardBox({ children, className }: React.ComponentProps<"section">) {
   return (
     <section
       className={cn(
-        "border bg-card flex flex-col items-center justify-center rounded-3xl p-6 sm:p-10 shadow-md",
-        className
+        "border bg-card flex flex-col items-center justify-center rounded-3xl p-6 sm:p-10 shadow-md max-w-2xl min-w-2xl",
+        className,
       )}
     >
       {children}

@@ -1,337 +1,157 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getAttendanceColor } from "../lib/calculate-attendance";
+"use client";
 
-interface AttendanceCalculatorProps {
-  totalConducted: number;
-  totalAttended: number;
-  mode?: "planner" | "results";
-}
+import * as React from "react";
 
-interface FutureCalculationResult {
-  percentage: number | null;
-  error: string;
-}
+import {
+  Field,
+  FieldSet,
+  FieldLabel,
+  FieldDescription,
+} from "@/components/ui/field";
+import { toast } from "sonner";
+import { CardBox } from "@/components/ui/box";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Percent } from "lucide-react";
+import Link from "next/link";
+import { getAttendanceColor } from "@/lib/get-attendance-color";
 
-const calculateFutureAttendance = (
-  totalConducted: number,
-  totalAttended: number,
-  futureClasses: string,
-  futureAttended: string
-): FutureCalculationResult => {
-  if (!futureClasses || !futureAttended) {
-    return { percentage: null, error: "" };
+export function AttendanceCalculator() {
+  const [conductedClasses, setConductedClasses] = React.useState<number>(0);
+  const [attendedClasses, setAttendedClasses] = React.useState<number>(0);
+  const [totalClasses, setTotalClasses] = React.useState<number>(0);
+  const [isPending, startTransition] = React.useTransition();
+  const [showAttendanceInfo, setShowAttendanceInfo] =
+    React.useState<boolean>(false);
+  // const [minimumPercentage, setMinimumPercentage] = React.useState<number>(75);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    startTransition(() => {
+      if (!conductedClasses || !attendedClasses) {
+        toast.error(
+          "Please provide both total classes conducted and classes attended.",
+        );
+        return;
+      }
+
+      if (conductedClasses <= 0) {
+        toast.error("Total classes conducted must be greater than zero.");
+        return;
+      }
+
+      if (attendedClasses < 0) {
+        toast.error("Classes attended cannot be a negative value.");
+        return;
+      }
+
+      if (attendedClasses > conductedClasses) {
+        toast.error("Classes attended cannot exceed total classes conducted.");
+        return;
+      }
+
+      setTotalClasses(Math.round((attendedClasses / conductedClasses) * 100));
+      setShowAttendanceInfo(true);
+    });
   }
-
-  const future = parseInt(futureClasses);
-  const attended = parseInt(futureAttended);
-
-  if (isNaN(future) || isNaN(attended)) {
-    return {
-      percentage: null,
-      error: "Please enter valid numbers",
-    };
-  }
-
-  if (future < 0) {
-    return {
-      percentage: null,
-      error: "Future classes cannot be negative",
-    };
-  }
-
-  if (attended < 0) {
-    return {
-      percentage: null,
-      error: "Classes attended cannot be negative",
-    };
-  }
-
-  if (attended > future) {
-    return {
-      percentage: null,
-      error: "You can't attend more classes than will be conducted!",
-    };
-  }
-
-  const newTotal = totalConducted + future;
-  const newAttended = totalAttended + attended;
-  const percentage = Math.round((newAttended / newTotal) * 100);
-
-  return { percentage, error: "" };
-};
-
-const AttendanceCalculator = ({
-  totalConducted,
-  totalAttended,
-  mode = "results",
-}: AttendanceCalculatorProps) => {
-  const [futureClasses, setFutureClasses] = useState("");
-  const [futureAttended, setFutureAttended] = useState("");
-
-  const currentPercentage = Math.round((totalAttended / totalConducted) * 100);
-
-  const { data: futureResult } = useQuery({
-    queryKey: [
-      "futureAttendance",
-      totalConducted,
-      totalAttended,
-      futureClasses,
-      futureAttended,
-    ],
-    queryFn: () =>
-      calculateFutureAttendance(
-        totalConducted,
-        totalAttended,
-        futureClasses,
-        futureAttended
-      ),
-    enabled: true,
-    staleTime: 0,
-  });
-
-  const futurePercentage = futureResult?.percentage ?? null;
-  const futureError = futureResult?.error ?? "";
-
-  const scenarios = [
-    { label: "Skip 1 class (2 hours)", classes: 2, attend: 0 },
-    { label: "Skip 2 classes (4 hours)", classes: 4, attend: 0 },
-    { label: "Skip 3 classes (6 hours)", classes: 6, attend: 0 },
-    { label: "Attend next 2 classes (4 hours)", classes: 4, attend: 4 },
-    { label: "Attend next 4 classes (8 hours)", classes: 8, attend: 8 },
-    { label: "Attend next 6 classes (12 hours)", classes: 12, attend: 12 },
-    {
-      label: "Perfect attendance for 1 week (10 hours)",
-      classes: 10,
-      attend: 10,
-    },
-    { label: "Miss 1 week entirely (10 hours)", classes: 10, attend: 0 },
-  ];
-
-  const getScenarioPercentage = (classes: number, attend: number) => {
-    const newTotal = totalConducted + classes;
-    const newAttended = totalAttended + attend;
-    return Math.round((newAttended / newTotal) * 100);
-  };
 
   return (
-    <div className="space-y-8">
-      {mode === "results" && (
-        <>
-          <div className="border border-(--color-border) rounded-lg p-6 sm:p-10 bg-(--color-card)">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-              <div>
-                <p className="text-sm text-(--color-muted-foreground) mb-2 uppercase tracking-wide">
-                  Your current attendance
-                </p>
-                <div className="flex items-baseline gap-4">
-                  <p className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-(--color-foreground)">
-                    {currentPercentage}%
-                  </p>
-                  <div>
-                    <p className="text-base sm:text-lg text-(--color-muted-foreground)">
-                      {totalAttended} / {totalConducted} classes
-                    </p>
-                    <p className="text-sm text-(--color-muted-foreground)">
-                      attended
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                  currentPercentage >= 85
-                    ? "bg-success/10 text-success"
-                    : currentPercentage >= 75
-                    ? "bg-warning/10 text-warning"
-                    : "bg-destructive/10 text-destructive"
-                }`}
-              >
-                {currentPercentage >= 85
-                  ? "✓ Good"
-                  : currentPercentage >= 75
-                  ? "⚠ Okay"
-                  : "✗ At Risk"}
-              </div>
-            </div>
-            <div className="pt-6 border-t border-(--color-border)">
-              <p className="text-sm text-(--color-muted-foreground)">
-                💡 <strong>Pro tip:</strong>{" "}
-                {currentPercentage >= 85
-                  ? "You're doing great! Keep maintaining this attendance."
-                  : currentPercentage >= 75
-                  ? "Try to attend more classes to reach 85% for a safer margin."
-                  : "You need to attend most upcoming classes to improve your percentage."}
+    <>
+      <CardBox>
+        <form onSubmit={handleSubmit}>
+          <FieldSet className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor="total-conducted">
+                Total classes conducted
+                <span className="text-xs text-muted-foreground -mb-1">
+                  till today
+                </span>
+              </FieldLabel>
+              <Input
+                id="total-conducted"
+                type="number"
+                placeholder="0"
+                value={conductedClasses || ""}
+                onChange={(e) => setConductedClasses(Number(e.target.value))}
+                className="hide-input-number"
+                required
+              />
+              <FieldDescription>
+                Total number of classes that happened
+              </FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="attend-classes">
+                Classes you attended
+                <span className="text-xs text-muted-foreground -mb-1">
+                  so far
+                </span>
+              </FieldLabel>
+              <Input
+                id="attend-classes"
+                type="number"
+                placeholder="0"
+                value={attendedClasses || ""}
+                onChange={(e) => setAttendedClasses(Number(e.target.value))}
+                className="hide-input-number"
+                required
+              />
+              <FieldDescription>
+                How many classes you were present for
+              </FieldDescription>
+            </Field>
+          </FieldSet>
+
+          <Button
+            type="submit"
+            size="lg"
+            className="mt-8 w-full"
+            disabled={isPending}
+          >
+            Calculate My Attendance <ArrowRight />
+          </Button>
+        </form>
+      </CardBox>
+
+      {showAttendanceInfo && (
+        <CardBox className="mt-4">
+          <div className="flex items-center gap-3 justify-center">
+            <div>
+              <p className="text-foreground/90 font-machine">
+                Your current attendance
+              </p>
+              <p className="text-base sm:text-lg text-muted-foreground">
+                {attendedClasses} / {conductedClasses} classes attended
               </p>
             </div>
-          </div>
+            <p className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
+              <span className={getAttendanceColor(totalClasses)}>
+                {totalClasses}
+              </span>
 
-          <div className="border border-(--color-border) rounded-lg p-6 sm:p-10 bg-(--color-card)">
-            <div className="mb-6">
-              <h3 className="text-lg sm:text-xl font-semibold text-(--color-foreground) mb-2">
-                Quick scenarios
-              </h3>
-              <p className="text-sm text-(--color-muted-foreground)">
-                See how common situations would affect your attendance
-              </p>
-            </div>
-            <div className="space-y-4">
-              {scenarios.map((scenario, index) => {
-                const percentage = getScenarioPercentage(
-                  scenario.classes,
-                  scenario.attend
-                );
-                const diff = percentage - currentPercentage;
-                return (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between py-4 px-5 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/50"
-                  >
-                    <div className="flex-1">
-                      <span className="text-base font-medium text-(--color-foreground) block mb-1">
-                        {scenario.label}
-                      </span>
-                      <span className="text-xs text-(--color-muted-foreground)">
-                        {diff >= 0 ? "+" : ""}
-                        {diff}% from current
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span
-                        className={`text-2xl font-bold ${getAttendanceColor(
-                          percentage
-                        )} block`}
-                      >
-                        {percentage}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
-
-      {mode === "planner" && (
-        <div className="border border-(--color-border) rounded-lg p-6 sm:p-10 bg-(--color-card)">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <span className="text-sm font-bold text-primary">2</span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-(--color-foreground)">
-                Plan your future attendance
-              </h2>
-            </div>
-            <p className="text-sm sm:text-base text-(--color-muted-foreground) leading-relaxed ml-0 sm:ml-10">
-              Enter how many classes are coming up and how many you plan to
-              attend
+              <Percent size={40} className="text-muted-foreground ml-0.5" />
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="space-y-3">
-              <label
-                htmlFor="futureClasses"
-                className="text-base font-medium text-(--color-foreground)"
-              >
-                Upcoming classes
-              </label>
-              <input
-                type="number"
-                id="futureClasses"
-                value={futureClasses}
-                onChange={(e) => setFutureClasses(e.target.value)}
-                min="0"
-                className="h-12 sm:h-14 w-full rounded border-2 border-(--color-border) bg-(--color-input) px-4 sm:px-5 text-base sm:text-lg text-(--color-foreground) placeholder:text-(--color-muted-foreground) focus:outline-none focus:border-(--color-primary) transition-colors"
-              />
-              <p className="text-xs text-(--color-muted-foreground) mt-1">
-                How many more classes will happen?
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <label
-                htmlFor="futureAttended"
-                className="text-base font-medium text-(--color-foreground)"
-              >
-                You&apos;ll attend
-              </label>
-              <input
-                type="number"
-                id="futureAttended"
-                value={futureAttended}
-                onChange={(e) => setFutureAttended(e.target.value)}
-                min="0"
-                className="h-12 sm:h-14 w-full rounded border-2 border-(--color-border) bg-(--color-input) px-4 sm:px-5 text-base sm:text-lg text-(--color-foreground) placeholder:text-(--color-muted-foreground) focus:outline-none focus:border-(--color-primary) transition-colors"
-              />
-              <p className="text-xs text-(--color-muted-foreground) mt-1">
-                How many will you be present for?
-              </p>
-            </div>
-          </div>
-
-          {futureError && (
-            <div className="mt-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
-              <div className="flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5 text-destructive shrink-0"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <p className="text-sm font-medium text-destructive">
-                  {futureError}
-                </p>
-              </div>
-            </div>
+          {totalClasses <= 75 && (
+            <Link
+              href={"/planner"}
+              className="mt-5 hover:underline hover:text-muted-foreground underline-offset-5 duration-300"
+            >
+              Plan Your Attendance
+            </Link>
           )}
 
-          {futurePercentage !== null && (
-            <div className="pt-8 border-t border-(--color-border)">
-              <p className="text-base text-(--color-muted-foreground) mb-3 uppercase tracking-wide">
-                Your projected attendance will be
-              </p>
-              <div className="flex items-baseline gap-4">
-                <p
-                  className={`text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight ${getAttendanceColor(
-                    futurePercentage
-                  )}`}
-                >
-                  {futurePercentage}%
-                </p>
-                <div className="flex flex-col gap-1">
-                  <span
-                    className={`text-sm font-semibold ${getAttendanceColor(
-                      futurePercentage
-                    )}`}
-                  >
-                    {futurePercentage >= currentPercentage ? "↑" : "↓"}{" "}
-                    {Math.abs(futurePercentage - currentPercentage)}%{" "}
-                    {futurePercentage >= currentPercentage
-                      ? "increase"
-                      : "decrease"}
-                  </span>
-                  <span className="text-xs text-(--color-muted-foreground)">
-                    compared to current
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            💡 <strong>Pro tip:</strong>{" "}
+            {totalClasses >= 75
+              ? "You're doing great! Keep maintaining this attendance."
+              : "Try to attend more classes to reach 75% for a safer margin."}
+          </p>
+        </CardBox>
       )}
-    </div>
+    </>
   );
-};
-
-export default AttendanceCalculator;
+}

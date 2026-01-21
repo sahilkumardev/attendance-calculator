@@ -6,11 +6,11 @@ import { TotalVisitors } from "@/components/total-visitors";
 
 export function SiteFooter() {
   return (
-    <footer className="place-content-center place-items-center w-full">
+    <footer className="place-content-center place-items-center w-full bottom-0 absolute">
       <div
         className={cn(
           "h-px w-full bg-size-[var(--height)_var(--width)] dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
-          "[mask:linear-gradient(to_left,var(--background)_var(--fade-stop),transparent),linear-gradient(to_right,var(--background)_var(--fade-stop),transparent),linear-gradient(black,black)]"
+          "[mask:linear-gradient(to_left,var(--background)_var(--fade-stop),transparent),linear-gradient(to_right,var(--background)_var(--fade-stop),transparent),linear-gradient(black,black)]",
         )}
         style={
           {
@@ -27,10 +27,10 @@ export function SiteFooter() {
       <div className="place-items-center py-4 sm:flex sm:items-center sm:justify-between sm:py-6 px-8 text-sm text-muted-foreground w-full">
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-0 w-full sm:justify-between">
           <h1>{new Date().getFullYear()} © All rights reserved.</h1>
-          
+
           <TotalVisitors />
-          
-          <p className="">
+
+          <p>
             Design & develop by ❤️
             <Link
               href="https://sahilkumardev.com"
