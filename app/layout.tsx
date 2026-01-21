@@ -27,7 +27,7 @@ export default function RootLayout({
             <MaxWidthWrapper>
               <Background />
               <SiteHeader />
-              <div className="min-h-screen max-h-screen place-items-center place-content-center">
+              <div className="min-h-[calc(100dvh-6rem)] lg:min-h-screen lg:max-h-screen place-items-center place-content-center px-4">
                 {children}
               </div>
               <SiteFooter />

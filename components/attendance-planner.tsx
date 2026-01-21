@@ -66,7 +66,7 @@ export function AttendancePlanner({
   ]);
 
   return (
-    <CardBox>
+    <CardBox className="mb-10 sm:mb-0">
       <FieldSet className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Field>
           <FieldLabel htmlFor="upcoming-classes">

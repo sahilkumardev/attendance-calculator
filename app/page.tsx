@@ -3,7 +3,7 @@ import { AttendanceCalculator } from "@/components/attendance-calculator";
 export default function Home() {
   return (
     <>
-      <div className="text-center mb-8 max-w-xl">
+      <div className="text-center mb-8 max-w-xl pt-20 sm:pt-0">
         <h1 className="text-3xl font-machine mb-2">
           Attendance Percentage Calculator
         </h1>

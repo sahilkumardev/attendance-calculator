@@ -16,15 +16,25 @@ import { ArrowRight, Percent } from "lucide-react";
 import Link from "next/link";
 import { getAttendanceColor } from "@/lib/get-attendance-color";
 import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tooltip, TooltipContent } from "./ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
 
 export function AttendanceCalculator() {
   const [conductedClasses, setConductedClasses] = React.useState<number>(0);
   const [attendedClasses, setAttendedClasses] = React.useState<number>(0);
-  const [minAttendance, setMinAttendance] = React.useState<number>(75);
+  const [requiredAttendance, setRequiredAttendance] =
+    React.useState<number>(75);
   const [totalClasses, setTotalClasses] = React.useState<number>(0);
-  const [isPending, startTransition] = React.useTransition();
   const [showAttendanceInfo, setShowAttendanceInfo] =
     React.useState<boolean>(false);
+
+  const [isPending, startTransition] = React.useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,12 +52,12 @@ export function AttendanceCalculator() {
         return;
       }
 
-      if (attendedClasses < 0) {
+      if (attendedClasses <= 0) {
         toast.error("Classes attended cannot be a negative value.");
         return;
       }
 
-      if (minAttendance < 0 || minAttendance > 100) {
+      if (requiredAttendance < 0 || requiredAttendance > 100) {
         toast.error("Minimum attendance must be between 0 and 100.");
         return;
       }
@@ -67,7 +77,7 @@ export function AttendanceCalculator() {
 
   return (
     <>
-      <CardBox className="relative">
+      <CardBox className="mt-8">
         <form onSubmit={handleSubmit}>
           <FieldSet className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Field>
@@ -113,37 +123,57 @@ export function AttendanceCalculator() {
             </Field>
 
             <div className="absolute -top-5.5 flex items-center justify-center left-0 right-0 w-full">
-              <h1 className="border p-2 size-10 rounded-full bg-muted">75</h1>
+              <Dialog>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DialogTrigger className="border py-2 px-4 rounded-xl bg-muted flex items-center justify-center hover:cursor-pointer">
+                      {requiredAttendance}
+                      <Percent
+                        size={18}
+                        className="text-muted-foreground ml-0.5"
+                      />
+                    </DialogTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{requiredAttendance}% required attendance</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <div>
-                <Field>
-                  <FieldLabel htmlFor="min-attendance">
-                    Minimum Attendance
-                    <span className="text-xs text-muted-foreground -mb-1">
-                      Required %
-                    </span>
-                  </FieldLabel>
-                  <Input
-                    id="min-attendance"
-                    type="number"
-                    placeholder="75"
-                    value={minAttendance || ""}
-                    onChange={(e) => setMinAttendance(Number(e.target.value))}
-                    className="hide-input-number"
-                    required
-                  />
-                  <FieldDescription>
-                    The cutoff percentage (default: 75%)
-                  </FieldDescription>
-                </Field>
-              </div>
+                <DialogContent className="sm:max-w-xs sm:p-10 ">
+                  <Field>
+                    <DialogTitle>
+                      <FieldLabel htmlFor="required-attendance">
+                        Minimum Attendance
+                        <span className="text-xs text-muted-foreground -mb-1">
+                          Required %
+                        </span>
+                      </FieldLabel>
+                    </DialogTitle>
+                    <Input
+                      id="required-attendance"
+                      type="number"
+                      placeholder="75"
+                      value={requiredAttendance || ""}
+                      onChange={(e) =>
+                        setRequiredAttendance(Number(e.target.value))
+                      }
+                      className="hide-input-number"
+                      required
+                    />
+
+                    <FieldDescription>
+                      The cutoff percentage (default: 75%)
+                    </FieldDescription>
+                  </Field>
+                </DialogContent>
+              </Dialog>
             </div>
           </FieldSet>
 
           <Button
             type="submit"
             size="lg"
-            className="mt-8 w-full"
+            className="mt-8 w-full py-6 rounded-full hover:cursor-pointer"
             disabled={isPending}
           >
             Calculate My Attendance <ArrowRight />
@@ -152,18 +182,20 @@ export function AttendanceCalculator() {
       </CardBox>
 
       {showAttendanceInfo && (
-        <CardBox className="mt-4">
+        <CardBox className="mt-4 mb-16 sm:mb-0">
           <div className="flex items-center gap-3 justify-center">
             <div>
-              <p className="text-foreground/90 font-machine">
+              <p className="text-foreground/90 font-machine text-sm">
                 Your current attendance
               </p>
               <p className="text-base sm:text-lg text-muted-foreground">
                 {attendedClasses} / {conductedClasses} classes attended
               </p>
             </div>
-            <p className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
-              <span className={getAttendanceColor(totalClasses, minAttendance)}>
+            <p className="text-6xl lg:text-7xl font-machine sm:-mb-2 -mb-1 flex items-center justify-center select-none">
+              <span
+                className={getAttendanceColor(totalClasses, requiredAttendance)}
+              >
                 {totalClasses}
               </span>
 
@@ -171,21 +203,23 @@ export function AttendanceCalculator() {
             </p>
           </div>
 
-          {totalClasses <= minAttendance && (
-            <Link
-              href={`/planner?conducted=${conductedClasses}&attended=${attendedClasses}&min=${minAttendance}`}
-              className="mt-5 hover:underline hover:text-muted-foreground underline-offset-5 duration-300"
-            >
-              Plan Your Attendance
-            </Link>
-          )}
-
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground mt-3 text-center">
             💡 <strong>Pro tip:</strong>{" "}
-            {totalClasses >= minAttendance
+            {totalClasses >= requiredAttendance
               ? "You're doing great! Keep maintaining this attendance."
-              : `Try to attend more classes to reach ${minAttendance}% for a safer margin.`}
+              : `Try to attend more classes to reach ${requiredAttendance}% for a safer margin.`}
           </p>
+
+          <div className="absolute -bottom-5 flex items-center justify-center left-0 right-0 w-full">
+            {totalClasses <= requiredAttendance && (
+              <Link
+                href={`/planner?conducted=${conductedClasses}&attended=${attendedClasses}&min=${requiredAttendance}`}
+                className="mt-5 hover:text-muted-foreground hover:bg-muted/90 underline-offset-5 duration-300 border py-2 px-4 rounded-xl bg-muted"
+              >
+                Plan Your Attendance
+              </Link>
+            )}
+          </div>
         </CardBox>
       )}
     </>
