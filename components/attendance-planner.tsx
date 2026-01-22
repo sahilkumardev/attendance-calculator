@@ -15,18 +15,15 @@ import { getAttendanceColor } from "@/lib/get-attendance-color";
 import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { PercentageValue } from "@/components/ui/percentage-value";
+import { redirect, useSearchParams } from "next/navigation";
 
-interface AttendancePlannerProps {
-  conductedClasses: number;
-  attendedClasses: number;
-  requiredAttendance: number;
-}
+export function AttendancePlanner() {
+  const searchParams = useSearchParams();
 
-export function AttendancePlanner({
-  conductedClasses,
-  attendedClasses,
-  requiredAttendance,
-}: AttendancePlannerProps) {
+  const conductedClasses = Number(searchParams.get("cond"));
+  const attendedClasses = Number(searchParams.get("att"));
+  const requiredAttendance = Number(searchParams.get("req")) || 75;
+
   const [upcomingClasses, setUpcomingClasses] = React.useState<number>(0);
   const [attendedUpcomingClasses, setAttendedUpcomingClasses] =
     React.useState<number>(0);
@@ -35,6 +32,10 @@ export function AttendancePlanner({
     conductedClasses,
     attendedClasses,
   );
+
+  if (!conductedClasses || !attendedClasses) {
+    redirect("/");
+  }
 
   const result = React.useMemo(() => {
     if (upcomingClasses < 0 || attendedUpcomingClasses < 0) {
