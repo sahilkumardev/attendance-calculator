@@ -11,24 +11,19 @@ import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://attendance.sahilkumardev.com"),
-  title: "Starter Pack CLI",
+  title: "Attendance Calculator",
   description:
-    "A comprehensive starter pack CLI tool for quickly scaffolding web and development projects, for beginners or who want to experience cli tool.",
+    "Calculate your attendance percentage, plan your future attendance, and stay on track with your academic goals.",
   keywords: [
-    "CLI Tool",
-    "Starter Pack",
-    "Project Generator",
-    "Web Development",
+    "Attendance Calculator",
+    "College Attendance",
+    "Percentage Calculator",
+    "Attendance Planner",
+    "Student Tools",
     "Next.js",
     "React",
     "TypeScript",
     "javascript",
-    "Development Tools",
-    "Scaffolding",
-    "Boilerplate",
-    "Template Generator",
-    "html",
-    "css",
     "tailwindcss",
   ],
   authors: [
@@ -40,11 +35,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://pack.sahilkumardev.com",
-    title: "Starter Pack CLI",
+    url: "https://attendance.sahilkumardev.com",
+    title: "Attendance Calculator",
     description:
-      "A comprehensive starter pack CLI tool for quickly scaffolding web and development projects.",
-    siteName: "Starter Pack CLI",
+      "Calculate your attendance percentage, plan your future attendance, and stay on track with your academic goals.",
+    siteName: "Attendance Calculator",
     images: [{ url: "/og-image.png" }],
   },
 
@@ -62,9 +57,9 @@ export const metadata: Metadata = {
   creator: "Sahilkumardev",
   twitter: {
     card: "summary",
-    title: "Starter Pack CLI",
+    title: "Attendance Calculator",
     description:
-      "A comprehensive starter pack CLI tool for quickly scaffolding web and development projects.",
+      "Calculate your attendance percentage, plan your future attendance, and stay on track with your academic goals.",
     creator: "@sahilkumardev",
   },
   icons: {
