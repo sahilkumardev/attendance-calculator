@@ -5,9 +5,9 @@ import { redirect, useSearchParams } from "next/navigation";
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const conductedClasses = Number(searchParams.get("conducted"));
-  const attendedClasses = Number(searchParams.get("attended"));
-  const minAttendance = Number(searchParams.get("min")) || 75;
+  const conductedClasses = Number(searchParams.get("cond"));
+  const attendedClasses = Number(searchParams.get("att"));
+  const requiredAttendance = Number(searchParams.get("req")) || 75;
 
   if (!conductedClasses || !attendedClasses) {
     redirect("/");
@@ -27,7 +27,7 @@ export default function Page() {
       <AttendancePlanner
         conductedClasses={conductedClasses}
         attendedClasses={attendedClasses}
-        minAttendance={minAttendance}
+        requiredAttendance={requiredAttendance}
       />
     </>
   );

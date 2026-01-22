@@ -13,18 +13,19 @@ import { CardBox } from "@/components/ui/box";
 import { Input } from "@/components/ui/input";
 import { getAttendanceColor } from "@/lib/get-attendance-color";
 import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
-import { ArrowDown, ArrowUp, Percent } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { PercentageValue } from "@/components/ui/percentage-value";
 
 interface AttendancePlannerProps {
   conductedClasses: number;
   attendedClasses: number;
-  minAttendance?: number;
+  requiredAttendance: number;
 }
 
 export function AttendancePlanner({
   conductedClasses,
   attendedClasses,
-  minAttendance = 75,
+  requiredAttendance,
 }: AttendancePlannerProps) {
   const [upcomingClasses, setUpcomingClasses] = React.useState<number>(0);
   const [attendedUpcomingClasses, setAttendedUpcomingClasses] =
@@ -154,24 +155,17 @@ export function AttendancePlanner({
               Your future attendance will be
             </p>
 
-            <div className="flex items-center gap-3 justify-center mt-2">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
-                <span
-                  className={getAttendanceColor(
-                    result.percentage,
-                    minAttendance,
-                  )}
-                >
-                  {result.percentage}
-                </span>
-
-                <Percent size={40} className="text-muted-foreground ml-0.5" />
-              </h1>
+            <div className="hidden sm:flex items-center gap-3 justify-center mt-2">
+              <PercentageValue
+                percentage={result.percentage}
+                requiredAttendance={requiredAttendance}
+                total={result.percentage}
+              />
               <div className="flex flex-col items-center justify-center px-2 sm:px-4">
                 <div
                   className={cn(
-                    "text-lg sm:text-base font-bold flex items-center gap-1",
-                    getAttendanceColor(result.percentage, minAttendance),
+                    "text-sm sm:text-base font-bold flex items-center gap-1 mr-1.5",
+                    getAttendanceColor(result.percentage, requiredAttendance),
                   )}
                 >
                   {result.percentage >= currentPercentage ? (
@@ -186,9 +180,46 @@ export function AttendancePlanner({
                 <span
                   className={cn(
                     "text-xs font-bold uppercase tracking-wider",
-                    getAttendanceColor(result.percentage, minAttendance),
+                    getAttendanceColor(result.percentage, requiredAttendance),
                   )}
                 >
+                  {result.percentage >= currentPercentage
+                    ? "Increase"
+                    : "Decrease"}
+                </span>
+                <span className="text-muted-foreground font-machine tracking-wide mt-0.5 text-sm sm:text-base">
+                  from current
+                </span>
+              </div>
+
+              <PercentageValue
+                percentage={currentPercentage}
+                requiredAttendance={requiredAttendance}
+                total={currentPercentage}
+              />
+            </div>
+
+            <div className="flex flex-col items-center gap-2 justify-center mt-2 sm:hidden">
+              <PercentageValue
+                percentage={result.percentage}
+                requiredAttendance={requiredAttendance}
+                total={result.percentage}
+              />
+              <div
+                className={cn(
+                  "text-sm font-medium flex items-center gap-1",
+                  getAttendanceColor(result.percentage, requiredAttendance),
+                )}
+              >
+                <span>
+                  {result.percentage >= currentPercentage ? (
+                    <ArrowUp size={18} />
+                  ) : (
+                    <ArrowDown size={18} />
+                  )}
+                </span>
+                <span>{Math.abs(result.percentage - currentPercentage)}%</span>
+                <span>
                   {result.percentage >= currentPercentage
                     ? "Increase"
                     : "Decrease"}
@@ -198,18 +229,11 @@ export function AttendancePlanner({
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-machine -mb-4 flex items-center justify-center select-none">
-                <span
-                  className={getAttendanceColor(
-                    currentPercentage,
-                    minAttendance,
-                  )}
-                >
-                  {currentPercentage}
-                </span>
-
-                <Percent size={40} className="text-muted-foreground ml-0.5" />
-              </h1>
+              <PercentageValue
+                percentage={currentPercentage}
+                requiredAttendance={requiredAttendance}
+                total={currentPercentage}
+              />
             </div>
           </div>
         )}

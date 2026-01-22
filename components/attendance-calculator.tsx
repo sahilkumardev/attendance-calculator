@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Percent } from "lucide-react";
 import Link from "next/link";
-import { getAttendanceColor } from "@/lib/get-attendance-color";
 import { getAttendancePercentage } from "@/lib/get-attendance-percentage";
 import {
   Dialog,
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent } from "./ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { PercentageValue } from "./ui/percentage-value";
 
 export function AttendanceCalculator() {
   const [conductedClasses, setConductedClasses] = React.useState<number>(0);
@@ -192,15 +192,12 @@ export function AttendanceCalculator() {
                 {attendedClasses} / {conductedClasses} classes attended
               </p>
             </div>
-            <p className="text-6xl lg:text-7xl font-machine sm:-mb-2 -mb-1 flex items-center justify-center select-none">
-              <span
-                className={getAttendanceColor(totalClasses, requiredAttendance)}
-              >
-                {totalClasses}
-              </span>
 
-              <Percent size={40} className="text-muted-foreground ml-0.5" />
-            </p>
+            <PercentageValue
+              percentage={totalClasses}
+              requiredAttendance={requiredAttendance}
+              total={totalClasses}
+            />
           </div>
 
           <p className="text-sm text-muted-foreground mt-3 text-center">
@@ -211,14 +208,12 @@ export function AttendanceCalculator() {
           </p>
 
           <div className="absolute -bottom-5 flex items-center justify-center left-0 right-0 w-full">
-            {totalClasses <= requiredAttendance && (
-              <Link
-                href={`/planner?conducted=${conductedClasses}&attended=${attendedClasses}&min=${requiredAttendance}`}
-                className="mt-5 hover:text-muted-foreground hover:bg-muted/90 underline-offset-5 duration-300 border py-2 px-4 rounded-xl bg-muted"
-              >
-                Plan Your Attendance
-              </Link>
-            )}
+            <Link
+              href={`/planner?cond=${conductedClasses}&att=${attendedClasses}&req=${requiredAttendance}`}
+              className="mt-5 hover:text-muted-foreground hover:bg-muted/90 underline-offset-5 duration-300 border py-2 px-4 rounded-xl bg-muted"
+            >
+              Plan Your Attendance
+            </Link>
           </div>
         </CardBox>
       )}
